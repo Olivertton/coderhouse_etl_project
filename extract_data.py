@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 
-# Tu clave API de OMDB
+# Clave API
 api_key = '2d55e958'
 
 # Término de búsqueda genérico
@@ -18,8 +18,8 @@ def get_ratings(ratings, source):
 movies_list = []
 
 # Iterar a través de las páginas de resultados
-for page in range(1, 11):  # Suponiendo que hay un máximo de 100 resultados
-    # URL de la API para buscar películas lanzadas en 2024
+for page in range(1, 11):  # Buscar solo 100 resultados
+    # URL de la API marcando pelicula, json y el término en el titulo
     search_url = f'http://www.omdbapi.com/?apikey={api_key}&s={search_term}&type=movie&r=json&page={page}'
 
     # Hacer una solicitud GET a la API
