@@ -1,7 +1,7 @@
 import psycopg2
 
 # Configuración de la conexión
-host = 'http://data-engineer-cluster.cyhh5bfevlmn.us-east-1.redshift.amazonaws.com/ '
+host = 'data-engineer-cluster.cyhh5bfevlmn.us-east-1.redshift.amazonaws.com'
 port = '5439'
 dbname = 'data-engineer-database'
 user = 'irving_ramirez_coderhouse'
@@ -16,6 +16,11 @@ conn = psycopg2.connect(
     port=port
 )
 cur = conn.cursor()
+
+# Eliminar la tabla si ya existe
+drop_table_query = "DROP TABLE IF EXISTS movies_2024;"
+cur.execute(drop_table_query)
+conn.commit()
 
 # Crear la tabla
 create_table_query = """
