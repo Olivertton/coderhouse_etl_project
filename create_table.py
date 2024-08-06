@@ -22,7 +22,7 @@ drop_table_query = "DROP TABLE IF EXISTS movies_2024;"
 cur.execute(drop_table_query)
 conn.commit()
 
-# Crear la tabla
+# Crear la tabla con tamaños de campo aumentados
 create_table_query = """
 CREATE TABLE IF NOT EXISTS movies_2024 (
     Title VARCHAR(256),
@@ -33,19 +33,19 @@ CREATE TABLE IF NOT EXISTS movies_2024 (
     Genre VARCHAR(256),
     Director VARCHAR(256),
     Writer VARCHAR(256),
-    Actors VARCHAR(256),
+    Actors VARCHAR(512),  -- Aumentar tamaño
     Plot TEXT,
-    Language VARCHAR(50),
-    Country VARCHAR(50),
-    Awards VARCHAR(256),
-    Poster VARCHAR(256),
+    Language VARCHAR(100),  -- Aumentar tamaño
+    Country VARCHAR(100),  -- Aumentar tamaño
+    Awards VARCHAR(512),  -- Aumentar tamaño
+    Poster VARCHAR(512),  -- Aumentar tamaño
     Metascore VARCHAR(10),
     imdbRating VARCHAR(10),
     imdbVotes VARCHAR(50),
     imdbID VARCHAR(50),
     Type VARCHAR(50),
     DVD VARCHAR(50),
-    BoxOffice VARCHAR(50),
+    BoxOffice VARCHAR(100),  -- Aumentar tamaño
     Production VARCHAR(256),
     Website VARCHAR(256),
     Response VARCHAR(10),
