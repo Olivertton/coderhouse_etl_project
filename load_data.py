@@ -1,12 +1,14 @@
 import psycopg2
 import pandas as pd
+import os
+from datetime import datetime
 
-# Configuración de la conexión
-host = 'data-engineer-cluster.cyhh5bfevlmn.us-east-1.redshift.amazonaws.com'
-port = '5439'
-dbname = 'data-engineer-database'
-user = 'irving_ramirez_coderhouse'
-password = 'T93hbU4sqc'
+# Configuración de la conexión desde variables de entorno
+host = os.getenv('REDSHIFT_HOST')
+port = os.getenv('REDSHIFT_PORT')
+dbname = os.getenv('REDSHIFT_DBNAME')
+user = os.getenv('REDSHIFT_USER')
+password = os.getenv('REDSHIFT_PASSWORD')
 
 # Leer el archivo CSV
 df = pd.read_csv('movies_2024.csv')
@@ -40,12 +42,13 @@ def truncate_value(value, max_length):
 
 # Insertar los datos en la tabla
 insert_query = """
-INSERT INTO movies_2024 (Title, Year, Rated, Released, Runtime, Genre, Director, Writer, Actors, Plot, Language, Country, Awards, Poster, Metascore, imdbRating, imdbVotes, imdbID, Type, DVD, BoxOffice, Production, Website, Response, IMDB_Rating, Rotten_Tomatoes_Rating, Metacritic_Rating)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO movies_2024 (Title, Year, Rated, Released, Runtime, Genre, Director, Writer, Actors, Plot, Language, Country, Awards, Poster, Metascore, imdbRating, imdbVotes, imdbID, Type, DVD, BoxOffice, Production, Website, Response, IMDB_Rating, Rotten_Tomatoes_Rating, Metacritic_Rating, ingestion_timestamp)
+VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 """
 
 for index, row in df.iterrows():
     imdb_rating, rotten_tomatoes_rating, metacritic_rating = convert_ratings(row['Ratings'])
+    ingestion_timestamp = datetime.now()
     cur.execute(insert_query, (
         truncate_value(row['Title'], 256), row['Year'], truncate_value(row['Rated'], 10), truncate_value(row['Released'], 50),
         truncate_value(row['Runtime'], 50), truncate_value(row['Genre'], 256), truncate_value(row['Director'], 256),
@@ -54,7 +57,8 @@ for index, row in df.iterrows():
         truncate_value(row['Poster'], 512), truncate_value(row['Metascore'], 10), truncate_value(row['imdbRating'], 10),
         truncate_value(row['imdbVotes'], 50), truncate_value(row['imdbID'], 50), truncate_value(row['Type'], 50),
         truncate_value(row['DVD'], 50), truncate_value(row['BoxOffice'], 100), truncate_value(row['Production'], 256),
-        truncate_value(row['Website'], 256), str(row['Response']), imdb_rating, rotten_tomatoes_rating, metacritic_rating
+        truncate_value(row['Website'], 256), str(row['Response']), imdb_rating, rotten_tomatoes_rating, metacritic_rating,
+        ingestion_timestamp
     ))
     conn.commit()
 
