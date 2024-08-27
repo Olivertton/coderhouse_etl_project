@@ -59,6 +59,11 @@ for page in range(1, 11):  # Buscar solo 100 resultados
 
 # Convertir datos a un DataFrame de pandas
 df = pd.DataFrame(movies_list)
+
+# Eliminar la columna "Ratings"
+if 'Ratings' in df.columns:
+    df.drop(columns=['Ratings'], inplace=True)
+
 # Guardar los datos en un archivo CSV
 df.to_csv('movies_2024.csv', index=False)
 print("Datos detallados guardados en movies_2024.csv")

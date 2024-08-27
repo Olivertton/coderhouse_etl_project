@@ -23,7 +23,7 @@ drop_table_query = "DROP TABLE IF EXISTS movies_2024;"
 cur.execute(drop_table_query)
 conn.commit()
 
-# Crear la tabla con tamaños de campo aumentados y una columna temporal
+# Crear la tabla con una clave primaria compuesta y sin la columna "Ratings"
 create_table_query = """
 CREATE TABLE IF NOT EXISTS movies_2024 (
     Title VARCHAR(256),
@@ -53,7 +53,8 @@ CREATE TABLE IF NOT EXISTS movies_2024 (
     IMDB_Rating VARCHAR(10),
     Rotten_Tomatoes_Rating VARCHAR(10),
     Metacritic_Rating VARCHAR(10),
-    ingestion_timestamp TIMESTAMP
+    ingestion_timestamp TIMESTAMP,
+    PRIMARY KEY (imdbID, Title)
 );
 """
 cur.execute(create_table_query)
