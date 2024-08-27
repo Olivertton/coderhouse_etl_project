@@ -46,26 +46,31 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
 # Iterar a través del DataFrame e insertar los registros
 for index, row in df.iterrows():
     try:
-        values = (
-            truncate_value(row['Title'], 256), row['Year'], truncate_value(row['Rated'], 10), truncate_value(row['Released'], 50),
-            truncate_value(row['Runtime'], 50), truncate_value(row['Genre'], 256), truncate_value(row['Director'], 256),
-            truncate_value(row['Writer'], 256), truncate_value(row['Actors'], 512), truncate_value(row['Plot'], 1000),
-            truncate_value(row['Language'], 100), truncate_value(row['Country'], 100), truncate_value(row['Awards'], 512),
-            truncate_value(row['Poster'], 512), truncate_value(row['Metascore'], 10), truncate_value(row['imdbRating'], 10),
-            truncate_value(row['imdbVotes'], 50), truncate_value(row['imdbID'], 50), truncate_value(row['Type'], 50),
-            truncate_value(row['DVD'], 50), truncate_value(row['BoxOffice'], 100), truncate_value(row['Production'], 256),
-            truncate_value(row['Website'], 256), truncate_value(row['Response'], 10), truncate_value(row['IMDB_Rating'], 10),
-            truncate_value(row['Rotten_Tomatoes_Rating'], 10), truncate_value(row['Metacritic_Rating'], 10),
-            row['ingestion_timestamp']
-        )
-        
-        # Asegurarse de que el número de valores sea correcto para la consulta
-        if len(values) != 28:
-            print(f"Error en la cantidad de valores para el registro {index}: se esperaban 28, pero se encontraron {len(values)}")
-            continue
+        # Verificación previa de duplicados
+        cur.execute("SELECT COUNT(1) FROM movies_2024 WHERE imdbID = %s AND Title = %s", (row['imdbID'], row['Title']))
+        if cur.fetchone()[0] == 0:  # Si no existe duplicado, inserta
+            values = (
+                truncate_value(row['Title'], 256), row['Year'], truncate_value(row['Rated'], 10), truncate_value(row['Released'], 50),
+                truncate_value(row['Runtime'], 50), truncate_value(row['Genre'], 256), truncate_value(row['Director'], 256),
+                truncate_value(row['Writer'], 256), truncate_value(row['Actors'], 512), truncate_value(row['Plot'], 1000),
+                truncate_value(row['Language'], 100), truncate_value(row['Country'], 100), truncate_value(row['Awards'], 512),
+                truncate_value(row['Poster'], 512), truncate_value(row['Metascore'], 10), truncate_value(row['imdbRating'], 10),
+                truncate_value(row['imdbVotes'], 50), truncate_value(row['imdbID'], 50), truncate_value(row['Type'], 50),
+                truncate_value(row['DVD'], 50), truncate_value(row['BoxOffice'], 100), truncate_value(row['Production'], 256),
+                truncate_value(row['Website'], 256), truncate_value(row['Response'], 10), truncate_value(row['IMDB_Rating'], 10),
+                truncate_value(row['Rotten_Tomatoes_Rating'], 10), truncate_value(row['Metacritic_Rating'], 10),
+                row['ingestion_timestamp']
+            )
 
-        cur.execute(insert_query, values)
-        conn.commit()
+            # Asegurarse de que el número de valores sea correcto para la consulta
+            if len(values) != 28:
+                print(f"Error en la cantidad de valores para el registro {index}: se esperaban 28, pero se encontraron {len(values)}")
+                continue
+
+            cur.execute(insert_query, values)
+            conn.commit()
+        else:
+            print(f"Registro duplicado encontrado y omitido: imdbID = {row['imdbID']}, Title = {row['Title']}")
     except Exception as e:
         print(f"Error al insertar el registro {index}: {e}")
 
